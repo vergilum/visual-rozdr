@@ -1,0 +1,9 @@
+fastapi==0.121.0
+uvicorn[standard]==0.38.0
+pydantic==2.12.4
+pydantic-settings==2.11.0
+aiogram==3.31.0
+pytest==8.4.2
+httpx==0.28.1
+python-multipart==0.0.20
+pyinstaller==6.18.0

@@ -1,0 +1,16 @@
+extends: ./electron-builder.base.yml
+directories:
+  output: ../artifacts/mac-demo
+extraResources:
+  - from: ../runtime/ffmpeg/darwin-${arch}
+    to: runtime/ffmpeg
+mac:
+  target:
+    - zip
+  category: public.app-category.entertainment
+  minimumSystemVersion: '13.0'
+  identity: '-'
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  notarize: false
+  artifactName: VisualPozdr-mac-${arch}-demo.zip

@@ -1,0 +1,12 @@
+extends: ./electron-builder.base.yml
+directories:
+  output: ../artifacts/electron
+extraResources:
+  - from: ../runtime/ffmpeg
+    to: runtime/ffmpeg
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

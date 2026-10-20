@@ -1,0 +1,12 @@
+appId: ru.visualpozdr.desktop
+productName: Visual Pozdr
+files:
+  - electron/**
+  - package.json
+extraResources:
+  - from: dist
+    to: frontend/dist
+  - from: ../artifacts/backend/visual-pozdr-backend
+    to: backend
+  - from: ../.env.example
+    to: config/.env.example

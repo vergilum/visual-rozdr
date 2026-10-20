@@ -1,0 +1,94 @@
+name: Build Mac demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: Mac architecture to build
+        type: choice
+        default: both
+        options:
+          - both
+          - arm64
+          - x64
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-demo-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }} demo
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-15' || 'macos-15-intel' }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: ${{ fromJSON(inputs.architecture == 'both' && '["arm64", "x64"]' || format('["{0}"]', inputs.architecture)) }}
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '13.0'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      TELEGRAM_BOT_TOKEN: ''
+      TELEGRAM_BOT_USERNAME: ''
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Check native architecture
+        run: node -e "if(process.arch !== '${{ matrix.arch }}') process.exit(1)"
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt
+      - name: Prepare source build tools
+        run: command -v pkg-config || brew install pkgconf
+      - name: Restore native media tools
+        id: media-cache
+        uses: actions/cache@v4
+        with:
+          path: runtime/ffmpeg/darwin-${{ matrix.arch }}
+          key: mac-media-v1-${{ matrix.arch }}-${{ hashFiles('scripts/build_mac_media.py') }}
+      - name: Build self-contained FFmpeg and ffprobe
+        if: steps.media-cache.outputs.cache-hit != 'true'
+        run: .venv/bin/python scripts/build_mac_media.py
+      - name: Use bundled tools for tests
+        run: echo "$GITHUB_WORKSPACE/runtime/ffmpeg/darwin-${{ matrix.arch }}" >> "$GITHUB_PATH"
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Test Electron platform code
+        working-directory: frontend
+        run: npm run desktop:test
+      - name: Build application
+        working-directory: frontend
+        run: npm run desktop:package:mac
+      - name: Test backend
+        run: .venv/bin/python -m pytest backend/tests
+      - name: Find packaged app
+        run: |
+          APP_PATH="$(find artifacts/mac-demo -maxdepth 2 -name '*.app' -type d -print -quit)"
+          test -n "$APP_PATH"
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+      - name: Check packaged backend and native video tools
+        run: .venv/bin/python scripts/smoke_packaged_backend.py "$APP_PATH"
+      - name: Check actual Electron windows, themes and QR
+        run: .venv/bin/python scripts/smoke_desktop_app.py "$APP_PATH"
+      - name: Verify ZIP roundtrip and assemble delivery files
+        run: .venv/bin/python scripts/package_mac_demo.py "${{ matrix.arch }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VisualPozdr-mac-${{ matrix.arch }}-demo
+          path: artifacts/mac-demo/delivery/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

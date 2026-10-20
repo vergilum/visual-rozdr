@@ -1,0 +1,7 @@
+extends: ./electron-builder.yml
+directories:
+  output: ../artifacts/portable
+win:
+  target:
+    - portable
+artifactName: VisualPozdr.exe
