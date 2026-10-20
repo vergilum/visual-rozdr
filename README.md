@@ -12,6 +12,9 @@
 Сборка: [docs/MAC_DEMO_BUILD.md](docs/MAC_DEMO_BUILD.md).
 Запуск и ручная проверка: [docs/MAC_DEMO_USER_GUIDE.md](docs/MAC_DEMO_USER_GUIDE.md).
 Готовность конкретного Mac-архива определяется результатом workflow и отчётом ручной проверки.
+Первые arm64/x64 ZIP успешно собраны и автоматически проверены на macOS 15.7.9:
+[отчёт, пути и контрольные суммы](docs/MAC_DEMO_VERIFICATION.md).
+Golden Gate 27.0.1, настоящий Telegram, звук и проектор ещё требуют проверки получателем.
 
 - FastAPI backend на `127.0.0.1:8000`.
 - SQLite база `data/app.sqlite3`.
