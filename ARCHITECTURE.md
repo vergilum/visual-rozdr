@@ -342,6 +342,7 @@ SHA-256, без зависимостей от Homebrew-библиотек. Пр�
 Windows fallback остаётся `taskkill`. При переносе fullscreen-окна на Mac main process ждёт
 `leave-full-screen` и только после этого меняет bounds; переносы сериализуются. Признак
 основного дисплея определяется сравнением ID с `screen.getPrimaryDisplay()`.
+Нативные объекты событий дисплея не передаются в IPC: renderer получает только сериализованный snapshot дисплеев.
 
 Workflow `.github/workflows/mac-demo.yml` запускается вручную на нативных macOS runners
 для arm64/x64, собирает ZIP и выполняет backend/desktop-тесты, packaged smoke, GUI-проверку

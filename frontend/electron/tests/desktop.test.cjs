@@ -81,3 +81,34 @@ test('Windows screen move does not wait for macOS-only fullscreen events', async
   await api.moveScreenWindow();
   assert.deepEqual(calls.map(([name]) => name), ['fullscreen', 'bounds', 'fullscreen']);
 });
+
+test('native display event objects are never forwarded over renderer IPC', async () => {
+  const listeners = {};
+  const state = { displays: [], screenOpen: false };
+  const sent = [];
+  const electron = {
+    app: { setName() {}, requestSingleInstanceLock: () => true, on() {}, whenReady: () => Promise.resolve(),
+      commandLine: { appendSwitch() {} } },
+    ipcMain: { handle() {} }, shell: {}, dialog: {},
+    BrowserWindow: { getAllWindows: () => [{ webContents: { send: (_, payload) => sent.push(payload) } }] },
+    screen: { on: (name, callback) => { listeners[name] = callback; } },
+  };
+  const module = { exports: {} };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'main.cjs'), 'utf8'), {
+    module, console, process: { argv: [] },
+    require(name) {
+      if (name === 'electron') return electron;
+      if (name === './config.cjs') return { getRuntimeConfig: () => ({}) };
+      if (name === './backend.cjs') return { startBackend: async () => {}, stopBackend: async () => {} };
+      if (name === './windows.cjs') return {
+        getScreenState: () => state, createAdminWindow() {}, onScreenWindowStateChanged() {},
+      };
+      return require(name);
+    },
+  });
+  await new Promise(setImmediate);
+  const nativeEvent = { sender: { nativeHandle: true } };
+  listeners['display-added'](nativeEvent, { id: 2 });
+  listeners['display-metrics-changed'](nativeEvent, { id: 2 }, ['bounds']);
+  assert.deepEqual(sent, [state, state]);
+});

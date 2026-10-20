@@ -19,10 +19,13 @@ async function smoke(config, adminWindow) {
   });
   if (!response.ok) throw new Error('Could not create smoke event');
   const event = await response.json();
+  console.log('Smoke: event created');
   await waitFor(async () => !adminWindow.webContents.isLoadingMainFrame()
     && adminWindow.webContents.executeJavaScript("Boolean(document.querySelector('h1'))"), 'admin render');
   const screenWindow = createScreenWindow(config);
+  console.log('Smoke: screen window created');
   for (const [theme, selector] of [['new_year', '.theme-new-year'], ['neutral', '.theme-neutral']]) {
+    console.log(`Smoke: loading ${theme}`);
     const update = await fetch(`${base}/api/events/${event.id}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ theme }),

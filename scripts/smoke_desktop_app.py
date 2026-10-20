@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -34,6 +35,21 @@ def check(app: Path) -> None:
             log = Path(temporary) / "logs" / "backend.log"
             if log.exists():
                 print(log.read_text(encoding="utf-8", errors="replace"))
+            if sys.platform == "darwin":
+                reports = sorted((Path.home() / "Library/Logs/DiagnosticReports").glob("Visual Pozdr*.ips"),
+                                 key=lambda entry: entry.stat().st_mtime, reverse=True)
+                for report in reports[:3]:
+                    print(f"Crash report: {report.name}")
+                    try:
+                        text = report.read_text(encoding="utf-8")
+                        data = json.loads(text.split("\n", 1)[1])
+                        print(json.dumps({key: data.get(key) for key in
+                                          ("procName", "exception", "termination", "asi", "faultingThread")}, indent=2))
+                        for thread in data.get("threads", []):
+                            if thread.get("triggered"):
+                                print(json.dumps(thread, indent=2)[:16000])
+                    except (ValueError, OSError) as error:
+                        print(f"Could not decode crash report: {error}")
             raise RuntimeError(f"Electron smoke failed: {result.returncode}")
 
 

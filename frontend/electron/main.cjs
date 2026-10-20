@@ -94,9 +94,9 @@ app.whenReady().then(async () => {
 
   const { screen } = require('electron');
   onScreenWindowStateChanged(broadcastScreenState);
-  screen.on('display-added', broadcastScreenState);
+  screen.on('display-added', () => broadcastScreenState());
   screen.on('display-removed', handleDisplayRemoved);
-  screen.on('display-metrics-changed', broadcastScreenState);
+  screen.on('display-metrics-changed', () => broadcastScreenState());
 
   try {
     await startBackend(config);
