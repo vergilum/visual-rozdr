@@ -672,12 +672,62 @@ button.screen-link {
 }
 
 .theme-idle-card {
+  --invite-qr-size: clamp(220px, min(20.84vw, 37vh), 400px);
   background: rgba(35, 18, 8, 0.26);
   border: 1px solid rgba(255, 242, 205, 0.22);
   border-radius: 34px;
   box-shadow: 0 26px 80px rgba(60, 20, 0, 0.2);
-  max-width: min(780px, 46vw);
-  padding: clamp(24px, 3vw, 44px);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  padding: clamp(20px, 2vw, 40px);
+  width: min(1080px, 56vw);
+}
+
+.screen-card.theme-idle-card {
+  max-width: 100%;
+}
+
+.screen-card.theme-idle-card h1 {
+  font-size: clamp(40px, 6vw, 120px);
+  overflow-wrap: anywhere;
+}
+
+.theme-idle-card .screen-text {
+  font-size: clamp(22px, 2.1vw, 42px);
+  margin: clamp(10px, 1.2vh, 16px) 0;
+  overflow-wrap: anywhere;
+}
+
+.theme-idle-card .screen-event-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(22px, 2vw, 38px);
+  line-height: 1.25;
+  margin: 12px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.theme-idle-card .screen-greeting {
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 clamp(20px, 2.6vh, 28px);
+  white-space: pre-line;
+}
+
+.theme-idle-card .screen-greeting:empty {
+  display: none;
+}
+
+.theme-idle-card .screen-invite strong {
+  display: block;
+  font-size: clamp(20px, 1.4vw, 28px);
+  line-height: 1.2;
+}
+
+.theme-idle-card .screen-hint {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(16px, 1.15vw, 23px);
+  margin: 12px 0 0;
 }
 
 .theme-idle-card .screen-text,
@@ -872,7 +922,6 @@ button.screen-link {
 
 .theme-neutral .theme-idle-card {
   justify-self: start;
-  max-width: min(680px, 42vw);
 }
 
 .theme-neutral .player-stage {
@@ -933,9 +982,9 @@ button.screen-link {
 .screen-invite {
   align-items: center;
   display: grid;
-  gap: 26px;
+  gap: clamp(20px, 2vw, 36px);
   grid-template-columns: auto minmax(0, 1fr);
-  margin: 28px 0;
+  margin: clamp(20px, 2.6vh, 28px) 0;
 }
 
 .telegram-link {
@@ -957,16 +1006,15 @@ button.screen-link {
   display: grid;
   font-size: 44px;
   font-weight: 900;
-  height: 180px;
+  height: var(--invite-qr-size, 180px);
   justify-content: center;
-  width: 180px;
+  width: var(--invite-qr-size, 180px);
 }
 
 .qr-placeholder img {
   border-radius: 20px;
   display: block;
   height: 100%;
-  padding: 10px;
   width: 100%;
 }
 
@@ -1249,7 +1297,8 @@ button.screen-link {
   }
 
   .screen-invite {
-    display: flex;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
   }
 
   .screen-status {
@@ -1271,6 +1320,16 @@ button.screen-link {
   .theme-new-year {
     align-items: start;
     padding: 18px;
+  }
+
+  .theme-neutral:not(.screen-playing) {
+    padding: 18px;
+  }
+
+  .theme-idle-card {
+    --invite-qr-size: clamp(180px, 60vw, 300px);
+    max-height: calc(100dvh - 36px);
+    width: 100%;
   }
 
   .new-year-tree {

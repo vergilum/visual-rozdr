@@ -13,4 +13,4 @@ mac:
   hardenedRuntime: false
   gatekeeperAssess: false
   notarize: false
-  artifactName: VisualPozdr-mac-${arch}-demo.zip
+  artifactName: VisualPozdr-mac-${arch}-011.zip

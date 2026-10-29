@@ -895,14 +895,14 @@ function IdleScene(props: ScreenThemeProps) {
     <div className="screen-card theme-idle-card">
       <p className="eyebrow">Экран трансляции · {interactive ? 'интерактивная стена' : 'ожидание'}</p>
       <h1>{event?.company_name || 'Visual Pozdr'}</h1>
-      <p className="screen-text">{event?.screen_text || 'Создайте мероприятие в панели оператора'}</p>
+      {event?.event_name?.trim() && <p className="screen-event-name">{event.event_name}</p>}
       <div className="screen-invite">
         <div className="qr-placeholder">
           {qrDataUrl ? <img src={qrDataUrl} alt="QR-код подключения к Telegram" /> : <span>QR</span>}
         </div>
         <div>
+          <p className="screen-text screen-greeting">{event?.screen_text || (event ? '' : 'Создайте мероприятие в панели оператора')}</p>
           <strong>Отправьте видеопоздравление в Telegram</strong>
-          {event?.connection_link && <p className="telegram-link">{event.connection_link}</p>}
           <p className="screen-hint">Откройте камеру телефона, наведите на QR-код и отправьте видеокружочек.</p>
         </div>
       </div>
@@ -1142,7 +1142,7 @@ function Screen({ state, error }: { state: AppState; error: string }) {
       setQrDataUrl('');
       return;
     }
-    QRCode.toDataURL(event.connection_link, { margin: 1, width: 280, errorCorrectionLevel: 'M' })
+    QRCode.toDataURL(event.connection_link, { margin: 4, width: 640, errorCorrectionLevel: 'M' })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(''));
   }, [event?.connection_link]);

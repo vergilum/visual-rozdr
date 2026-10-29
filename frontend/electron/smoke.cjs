@@ -35,7 +35,10 @@ async function smoke(config, adminWindow) {
       && screenWindow.webContents.executeJavaScript(`Boolean(document.querySelector('${selector}'))
         && [...document.images].length >= 3
         && [...document.images].every(image => image.complete && image.naturalWidth > 0)
-        && Boolean(document.querySelector('img[alt="QR-код подключения к Telegram"]'))`), `${theme} assets and QR`);
+        && document.querySelector('img[alt="QR-код подключения к Telegram"]')?.naturalWidth === 640
+        && document.querySelector('.screen-event-name')?.textContent === 'Isolated build check'
+        && document.querySelector('.screen-greeting')?.textContent === 'С Новым годом!'
+        && !document.querySelector('.telegram-link')`), `${theme} assets, QR and invitation text`);
   }
   await waitFor(async () => {
     const state = await (await fetch(`${base}/api/state`)).json();

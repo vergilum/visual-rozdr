@@ -19,7 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main(arch: str) -> None:
     output = ROOT / "artifacts" / "mac-demo"
-    archive = output / f"VisualPozdr-mac-{arch}-demo.zip"
+    version = json.loads((ROOT / "frontend" / "package.json").read_text(encoding="utf-8"))["version"]
+    release_id = version.replace(".", "")
+    archive = output / f"VisualPozdr-mac-{arch}-{release_id}.zip"
     guide = ROOT / "docs" / "MAC_DEMO_USER_GUIDE.md"
     with zipfile.ZipFile(archive, "a") as bundle:
         bundle.write(guide, "READ-ME-MAC.md")
@@ -35,6 +37,7 @@ def main(arch: str) -> None:
         checksum = hashlib.file_digest(source, "sha256").hexdigest()
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     info = {
+        "version": version,
         "architecture": arch, "build_os": platform.mac_ver()[0], "commit": commit,
         "workflow_run": os.environ.get("GITHUB_RUN_ID"), "archive": archive.name,
         "bytes": archive.stat().st_size, "sha256": checksum,

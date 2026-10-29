@@ -1,7 +1,7 @@
 extends: ./electron-builder.yml
 directories:
-  output: ../artifacts/portable
+  output: ../artifacts/releases/011/windows
 win:
   target:
     - portable
-artifactName: VisualPozdr.exe
+artifactName: VisualPozdr-011.exe
